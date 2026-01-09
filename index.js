@@ -4,6 +4,7 @@ const { Client, Collection, Events, Partials, GatewayIntentBits, MessageFlags, P
 const { token } = require('./config.json');
 
 let anonimos = new Map();
+let sem_numeros = [];
 
 const client = new Client({ 
 	intents: [
@@ -81,11 +82,31 @@ client.on(Events.MessageCreate, async (message) => {
 		console.log(`${message.author.tag}: ${message.content}`);
 	} else {
 		console.log(`(dm) ${message.author.tag}: ${message.content}`);
-		const channel = client.channels.cache.get('1458866822961954909');
 
 		if (!anonimos.has(message.author.tag)) {
 			anonimos.set(message.author.tag, anonimos.size);
 		}
+
+		if (message.content.startsWith('wc.')) {
+			let comando = message.content.split('wc.')[1].split(' ')[0];
+
+			switch (comando) {
+			case 'privado' :
+				if (!sem_numeros.includes(anonimos.get(message.author.tag))) {
+					sem_numeros.push(anonimos.get(message.author.tag));
+					message.reply('Seu número não irá mais aparecer!');
+				} else {
+					const index = sem_numeros.indexOf(anonimos.get(message.author.tag));
+					sem_numeros.splice(index, 1);
+					message.reply('Seu número irá aparecer!');
+				}
+				break;
+			}
+
+			return;
+		}
+
+		const channel = client.channels.cache.get('1458866822961954909');
 
 		if (message.content.split('@everyone').length > 1 || message.content.split('@here').length > 1) {
 			await channel.send({content: `Anônimo ${anonimos.get(message.author.tag)} Tentou marcar geral (é o(a) ${message.author.tag})`});
@@ -103,7 +124,13 @@ client.on(Events.MessageCreate, async (message) => {
 			}
 		}
 
-		await channel.send({content: `\`Anônimo ${anonimos.get(message.author.tag)} :\` ${messageText}`});
+		const id = anonimos.get(message.author.tag);
+
+		if (!sem_numeros.includes(id)) {
+			await channel.send({content: `\`Anônimo ${id} :\` ${messageText}`});
+		} else {
+			await channel.send({content: `\`Anônimo :\` ${messageText}`});
+		}
 	}
 });
 
