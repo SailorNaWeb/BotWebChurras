@@ -87,10 +87,10 @@ client.on(Events.MessageCreate, async (message) => {
 			anonimos.set(message.author.tag, anonimos.size);
 		}
 
-		if (message.content.startsWith('wc.')) {
-			let comando = message.content.split('wc.')[1].split(' ')[0];
+		if (message.content.toLowerCase().startsWith('wc.')) {
+			let comando = message.content.toLowerCase().split('wc.')[1].split(' ')[0];
 
-			switch (comando) {
+			switch (comando.toLowerCase()) {
 			case 'privado' :
 				if (!sem_numeros.includes(anonimos.get(message.author.tag))) {
 					sem_numeros.push(anonimos.get(message.author.tag));
