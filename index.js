@@ -11,7 +11,9 @@ const client = new Client({
 		GatewayIntentBits.Guilds,
 		GatewayIntentBits.DirectMessages,
 		GatewayIntentBits.GuildMessages,
+		GatewayIntentBits.GuildMembers,
 		GatewayIntentBits.MessageContent,
+		GatewayIntentBits.GuildMessagePolls,
 	],
 	partials: [Partials.Channel, Partials.Message]
 });
@@ -106,7 +108,7 @@ client.on(Events.MessageCreate, async (message) => {
 			return;
 		}
 
-		const channel = client.channels.cache.get('1458866822961954909');
+		const channel = client.channels.cache.get('1460606547091652791');
 
 		if (message.content.split('@everyone').length > 1 || message.content.split('@here').length > 1) {
 			await channel.send({content: `Anônimo ${anonimos.get(message.author.tag)} Tentou marcar geral (é o(a) ${message.author.tag})`});
