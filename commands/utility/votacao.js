@@ -21,7 +21,7 @@ module.exports = {
 	    const channel = client.channels.cache.get('1458866822961954909');
 		const title = interaction.options.getString("título");
 
-		channel.send({content: "Nova votação iniciada! <@1460603564178149528>"})
+		channel.send({content: "Nova votação iniciada! <@&1460603564178149528>"});
 
 	    createPoll(channel, respostas, title, 1);
 	},
@@ -40,12 +40,18 @@ async function createPoll (channel, respostas, title, round) {
 
 	setTimeout(async () => {
 		await message.poll.end();
-		let respostasPoll = message.poll.answers;
+
+		setTimeout(()=>{}, 5000);
+
+		let respostasPoll = await message.poll.answers;
 
 		let respostasOrdenadas = [];
 
 		respostasPoll.each((resposta, key) => {
-			let respostaAtual = [respostas[key-1], resposta];
+			console.log(resposta.voteCount + " " + key);
+
+			let respostaAtual = [respostas[key - 1], resposta.voteCount];
+			
 			if (respostasOrdenadas.length == 0) {
 				respostasOrdenadas[0] = respostaAtual;
 			} else {
@@ -66,11 +72,11 @@ async function createPoll (channel, respostas, title, round) {
 
 		let status;
 
-		if (respostas.length == 10) {
+		if (respostasOrdenadas.length == 10) {
 			status = 0;
-		} else if (respostas.length >= 5) {
+		} else if (respostasOrdenadas.length >= 5) {
 			status = 1;
-		} else if (respostas.length < 5 && respostas.length > 2) {
+		} else if (respostasOrdenadas.length < 5 && respostasOrdenadas.length > 2) {
 			status = 2;
 		} else {
 			status = 3;
@@ -78,14 +84,15 @@ async function createPoll (channel, respostas, title, round) {
 
 		if (status != 3) {
 
-			for (let i = 0; i < status == 0 ? 5 : status == 1 ? (int)(respostas.length / 2) : 2; i++) {
-				console.log(respostasOrdenadas[i]);
+			for (let i = 0; i < (status == 0 ? 5 : status == 1 ? Math.trunc(respostasOrdenadas.length / 2) : 2); i++) {
+				respostasRound2[i] = respostasOrdenadas[i][0];
 			}
 
-			createPoll(channel, respostasRound2, title, round++);
+			channel.send({content: "Próximo round! <@&1460603564178149528>"});
+			createPoll(channel, respostasRound2, title, ++round);
 		} else {
 			channel.send({content: "O(A) ganhador(a) foi: " + respostasOrdenadas[0][0].text});
 		}
 
-	}, 10000);
+	}, 3600000);
 }
